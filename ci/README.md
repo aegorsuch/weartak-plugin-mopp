@@ -34,6 +34,8 @@ canonical `weartak-plugins/weartak-plugin-sdk` source from `sdk-source.propertie
 using `SDK_READ_TOKEN` if set, otherwise `CI_JOB_TOKEN`. Source is checked out
 detached at that immutable SHA; existing SDK source changes or a different origin
 fail explicitly. Local derived AAR hashes are provenance, not signed publication.
+Transient source authentication also covers partial-clone lazy fetches during
+checkout; it is not persisted into the cloned repository's configuration.
 CI must be allowed to read SDK source; it does not fetch template binaries.
 For dependency routing, both plugin and SDK prefer the existing TAK Artifactory
 consumer when a complete pair exists: first nonblank user from

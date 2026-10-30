@@ -25,13 +25,16 @@ fi
 [ "$(git -C "$source" remote get-url origin)" = "$repo" ] || {
     echo "ERROR: SDK source origin mismatch." >&2; exit 1;
 }
-[ -z "$(git -C "$source" status --porcelain --untracked-files=no)" ] || {
+[ -z "$(sdk_git -C "$source" status --porcelain --untracked-files=no)" ] || {
     echo "ERROR: SDK source has local changes; refusing to overwrite." >&2; exit 1;
 }
 sdk_git -C "$source" fetch --quiet --depth 1 origin "$revision"
-git -C "$source" checkout --quiet --detach "$revision"
+sdk_git -C "$source" checkout --quiet --detach "$revision"
 [ "$(git -C "$source" rev-parse HEAD)" = "$revision" ] || {
     echo "ERROR: SDK source revision mismatch." >&2; exit 1;
+}
+[ -f "$source/settings.gradle.kts" ] || {
+    echo "ERROR: pinned SDK source checkout is incomplete." >&2; exit 1;
 }
 chmod +x "$source/gradlew"
 "$source/gradlew" -p "$source" --no-daemon --console=plain assembleDebug assembleRelease
