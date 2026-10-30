@@ -90,7 +90,8 @@ this plugin, without duplicate writers.
 
 Use JDK 17 and Android SDK 35. Packaging follows LACE's pinned canonical revision
 `c1e0116925b199a4a081ddc5682f8434888fd006`: Gradle 8.14.5, AGP 8.13.2,
-Kotlin 2.2.0, minSdk 30 and targetSdk 34. MOPP has its own base version **0.1.0**.
+Kotlin 2.2.0, minSdk 30 and targetSdk 34. MOPP's base version **5.8.4**
+matches WearTAK and the other WearTAK plugins (base versionCode **584**).
 
 Build SDK inputs from the canonical repository and immutable commit recorded in
 [`sdk-source.properties`](sdk-source.properties):
