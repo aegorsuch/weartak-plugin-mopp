@@ -1,0 +1,3 @@
+<resources>
+    <style name="Theme.Mopp" parent="@android:style/Theme.DeviceDefault" />
+</resources>
