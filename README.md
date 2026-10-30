@@ -52,10 +52,19 @@ MOPP 0 through 4, and a never-saved selection is distinct from all six choices.
 - New bindings start without cached selections or drafts. Stale in-flight replies
   cannot restore an old binding's state.
 - If the plugin is absent or incompatible, the host must stop MOPP reporting while
-  retaining saved status, timestamp and enable preference. Reconnection reads that
+  retaining saved status and timestamp. Reconnection reads that
   state without creating a default or a new saved timestamp.
-- The host's disabled-by-default enable preference is preserved. Enable remains a
-  separate explicit action; choices cannot save while reporting is disabled.
+- Always-on publishing requires a matching WearTAK host companion change: status
+  reads report `enabled=true`, saves accept legacy false or unset enable state, and
+  `setEnabled(false)` remains revision-checked/idempotent but normalizes to true
+  without changing saved selection or timestamp. Until that host change lands, this
+  behavior is not shipped. The plugin never enables publishing on read.
+- A matching host change also derives the Plugins-menu subtitle from authoritative
+  status: null selection displays `None` without saving it; explicit None also
+  displays `None`; saved levels display as compact `MOPP0` through `MOPP4`. This host
+  rendering is not shipped yet.
+- Reporting is gated only by a live compatible plugin and a saved selection; unset
+  selection never contributes.
 
 `MoppEditor` and `MoppHost` are editor-domain types, not SDK IPC declarations.
 Their tests use an in-memory host double; they are not proof of host enforcement.
@@ -72,7 +81,7 @@ with typed `MoppPpeResultParcel` / `MoppPpeStateParcel` results.
 
 Missing capability or a mismatched descriptor shows **Update WearTAK**. The plugin
 links Binder death, validates typed results and reads authoritative state before
-enabling changes. Remote failures require reconciliation; no automatic replay.
+allowing selection changes. Remote failures require reconciliation; no automatic replay.
 The adapter never manually encodes Binder transactions or invokes raw CoT APIs.
 Host-side builtin routing removal and all reporting gates must ship together with
 this plugin, without duplicate writers.
