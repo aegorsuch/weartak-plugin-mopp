@@ -3,6 +3,7 @@ package com.weartak.plugin.mopp.host
 import android.content.Intent
 import android.content.pm.PackageManager
 import com.weartak.plugin.mopp.BuildConfig
+import com.weartak.plugin.mopp.R
 import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,6 +16,8 @@ import org.robolectric.annotation.Config
 class MoppDiscoveryTest {
     @Test fun pluginMenuDiscoveryExposesServiceAndExternalActivity() {
         val context = RuntimeEnvironment.getApplication()
+        assertEquals("MOPP", context.getString(R.string.app_name))
+        assertEquals(R.drawable.mopp_launcher, context.applicationInfo.icon)
         val services = context.packageManager.queryIntentServices(
             Intent("com.weartak.plugin.action.PLUGIN_SERVICE")
                 .addCategory(Intent.CATEGORY_DEFAULT)

@@ -134,10 +134,7 @@ private fun MoppScreen(
         if (launchError) item { Notice(R.string.host_unavailable, error = true) }
         state.message?.let { message -> item { Notice(message.resource, error = message.isError) } }
         when (state.availability) {
-            Availability.DISCONNECTED -> {
-                item { Notice(R.string.disconnected) }
-                item { Notice(R.string.host_unavailable) }
-            }
+            Availability.DISCONNECTED -> item { Notice(R.string.disconnected) }
             Availability.UPDATE_WEARTAK -> item { Notice(R.string.update_weartak, error = true) }
             Availability.READY -> {
                 val saved = state.saved
@@ -163,7 +160,6 @@ private fun MoppScreen(
                             )
                         }
                     }
-                    item { Notice(if (saved.contributing) R.string.contributing else R.string.inactive) }
                     item {
                         ToggleChip(
                             checked = saved.enabled,

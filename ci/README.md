@@ -4,26 +4,22 @@ Same model as WearTAK WearOS (`core/weartak-core/wearos-tak-civ`) and the WearTA
 template. TAK.gov (`git.tak.gov/weartak-plugins/weartak-plugin-mopp`) is canonical; GitHub
 (`aegorsuch/weartak-plugin-mopp`) is a mirror.
 
-**Release is currently blocked** in `preReleaseBuild`: the shared typed PPE SDK
-adapter is implemented but matching host integration is not yet cleared. The pipeline below
-is scaffolded, not evidence of a production-signed or published build. Release
-and publisher jobs explicitly use `when: never` for source-only publication, so
-merging this scaffold does not access signing material or distribute an APK.
+Protected-main builds produce production-signed internal artifacts using the
+same release workflow as LACE revision `1772e1bd`, with plugin-specific names.
+Workflow activation must wait for coordinated host MOPP routing/builtin removal acceptance.
+Building or downloading an artifact does not authorize device installation.
 
 ## Pipeline
 
 | Trigger | Jobs |
 | --- | --- |
 | Merge request | `release_publisher_tests`, `release_checklist_tests`, `unit_tests` (debug build, no production signing) |
-| Push to protected `main` | tests and debug build only |
-| Tag | tests and debug build only |
+| Push to protected `main` | tests, `main_release` signed APK/checksum/metadata (30 days), then `publish_github_main` |
+| `vX.Y.Z[.B]` tag | tests, `official_release` signed APK (kept forever) |
 
-After SDK, host, hardware and signing acceptance, restore these dormant rules:
-`main_release` on default-branch push, `official_release` on `vX.Y.Z[.B]` tags,
-and `publish_github_main` only on protected `main` pushes from this exact
-canonical project. Keep the independent Gradle release gate until integration
-has been verified. The remaining release documentation describes that future
-pipeline, not currently enabled behavior.
+Publication is automatic on canonical protected-main push, matching other plugins.
+Do not merge activation before matching host migration acceptance and administrator
+setup are cleared. MR jobs do not access signing keys.
 
 Release builds are signed with the **WearTAK production key** and the job fails unless the
 APK signer SHA-256 is `1579b600…348d`. Release WearTAK only binds plugins with the same
@@ -98,6 +94,13 @@ Safety rules (identical to WearOS, see `ci/publish_github_release.py`):
    `MOPP_GITHUB_TOKEN` (masked, protected, hidden, no expansion).
 5. If `CI_JOB_TOKEN` cannot read SDK source, an administrator must approve access
    or add `SDK_READ_TOKEN` (read_repository); do not change access automatically.
+6. Confirm host migration acceptance before merging workflow activation. This
+   workflow does not install on watches. `RELEASE_TESTER` must name an existing
+   GitHub collaborator for the post-publication checklist assignment.
+
+The fixed GitHub anchor was absent when the workflow was added. Creating it and
+configuring any missing token requires owner-approved setup; CI fails explicitly
+instead of minting credentials, moving tags, or publishing an unsigned fallback.
 
 ## Release testing
 

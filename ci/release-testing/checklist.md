@@ -11,6 +11,7 @@ Hardware acceptance is manual; automated tests do not imply a device pass.
 - [ ] An unsupported host shows **Update WearTAK** and cannot save or publish.
 - [ ] Saved selection initially matches WearTAK, including never saved, None, and MOPP 0.
 - [ ] Header says MOPP, with no gas-mask icon or header helper text.
+- [ ] No explanatory active/inactive or connection helper text inside plugin; host plugins-list icon remains.
 - [ ] Legacy unknown saved time remains unknown after open and reconnect.
 - [ ] Every choice from None through MOPP 4 saves immediately on tap; no Save control.
 - [ ] Checked selection changes only after WearTAK acknowledges durable persistence.
