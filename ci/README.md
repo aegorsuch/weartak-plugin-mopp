@@ -55,10 +55,10 @@ This Maven routing does not grant cross-project SDK source access.
 
 Same scheme as WearTAK (WEARTAK-239), in `app/build.gradle.kts`:
 
-- `baseVersionCode` / `baseVersionName` (currently `1` / `0.1.0`), independently
-  versioned from WearTAK. Bump them for each official `vX.Y.Z[.B]` tag.
+- `baseVersionCode` / `baseVersionName` (currently `584` / `5.8.4`) match
+  WearTAK and the other WearTAK plugins. Bump them for each official `vX.Y.Z[.B]` tag.
 - CI builds: versionCode = `base * 10000 + CI_PIPELINE_IID` (build fails at IID ≥ 10000),
-  versionName = `<base>-p<IID>+<short sha>`, e.g. `0.1.0-p12+1a2b3c4d`. Every pipeline is
+  versionName = `<base>-p<IID>+<short sha>`, e.g. `5.8.4-p12+1a2b3c4d` (versionCode `5840012`). Every pipeline is
   therefore an in-place upgrade (MDMs such as Knox accept it).
 - Local builds: versionCode = base, versionName = base.
 
