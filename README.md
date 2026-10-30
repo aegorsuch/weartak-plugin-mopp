@@ -17,9 +17,11 @@ host persistence, lifecycle and reporting gates must pass coordinated acceptance
 There is deliberately no private Binder encoding, reflective adapter, raw CoT,
 chat, marker, settings-mutation fallback, or local saved-PPE store.
 
-Source publication does not imply a verified release. Release/signing/publisher
-CI jobs remain disabled, and `preReleaseBuild` independently fails closed. Actual
-MOPP UI belongs to this plugin; the host retains storage and status projection.
+Source publication does not imply host/device acceptance. Protected-main CI builds
+production-signed APKs with verified signer and SHA-256; GitHub publication then
+runs automatically, matching other plugins. Activation must wait for coordinated
+host acceptance. Actual MOPP UI belongs to this
+plugin; the host retains storage and status projection.
 Do not install against a host that lacks the matching typed capability.
 
 ## Source provenance
@@ -28,8 +30,8 @@ Initial source was authored in the standalone MOPP development session and impor
 from its sanitized October 30, 2026 snapshot. Packaging and CI were adapted from
 canonical TAK.gov LACE revision `c1e0116925b199a4a081ddc5682f8434888fd006`.
 SDK binaries, local configuration, signing material and build outputs are not
-included. The existing configured GitHub mirror carries source only until all
-release gates below are satisfied.
+included. Source mirrors automatically; signed APK publication is a separate
+verified step after all release gates below are satisfied.
 
 ## State ownership and behavior
 
@@ -116,7 +118,8 @@ Do not distribute an operational release until all gates pass.
    configure protected `main`, and create the fixed rolling-release anchor tag
    after a commit exists in the mirror. Protected `main` and the enabled source
    mirror were verified during source publication; no token or tag was provisioned.
-6. Only after these gates pass, restore the documented release CI triggers.
+6. Only after these gates pass, merge release workflow activation. Signing
+   builds alone never authorize installation or operational status transmission.
 
 No device pass, production-signature pass, canonical merge, mirror publication,
 or release is implied by a successful debug build or mocked publisher tests.

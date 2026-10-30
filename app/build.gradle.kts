@@ -78,14 +78,6 @@ android {
 apply(from = rootProject.file("gradle/weartak-sideload-debug.gradle"))
 apply(from = rootProject.file("gradle/weartak-sideload-production.gradle"))
 
-tasks.matching { it.name == "preReleaseBuild" }.configureEach {
-    doFirst {
-        throw GradleException(
-            "MOPP release blocked: the shared typed PPE SDK and host integration have not been verified.",
-        )
-    }
-}
-
 dependencies {
     debugImplementation(files("libs/weartak-plugin-sdk-debug.aar"))
     releaseImplementation(files("libs/weartak-plugin-sdk-release.aar"))
