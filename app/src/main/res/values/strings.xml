@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">MOPP</string>
+    <string name="plugin_subtitle">Protective posture</string>
+    <string name="back_to_weartak">Back to WearTAK</string>
+    <string name="saved_selection">Saved: %1$s</string>
+    <string name="never_saved">Not set</string>
+    <string name="none">None</string>
+    <string name="mopp_level">MOPP %1$d</string>
+    <string name="saved_time">Saved %1$s</string>
+    <string name="unknown_saved_time">Saved time unknown</string>
+    <string name="refresh">Read from WearTAK</string>
+    <string name="enabled">Publishing enabled</string>
+    <string name="disabled">Publishing disabled</string>
+    <string name="contributing">Active in WearTAK</string>
+    <string name="inactive">Inactive; saved selection retained</string>
+    <string name="working">Working with WearTAK...</string>
+    <string name="disconnected">WearTAK not connected</string>
+    <string name="update_weartak">Update WearTAK</string>
+    <string name="host_unavailable">Open WearTAK to connect the plugin.</string>
+    <string name="error_conflict">WearTAK changed. Review the saved selection before choosing again.</string>
+    <string name="error_invalid">WearTAK rejected this request. Read the current selection and try again.</string>
+    <string name="error_denied">WearTAK revoked access. Reconnect the plugin.</string>
+    <string name="error_persistence">WearTAK could not save. Read the saved selection before choosing again.</string>
+    <string name="error_transport">WearTAK did not confirm the operation. Read the saved selection before trying again.</string>
+    <string name="error_unconfirmed">The previous operation is unconfirmed. Read from WearTAK before another change.</string>
+    <string name="error_protocol">WearTAK returned an invalid state. Update WearTAK before saving.</string>
+    <string name="saved">Saved in WearTAK</string>
+    <string name="reconciled">Previous change confirmed by WearTAK</string>
+    <string name="not_reconciled">Current WearTAK state loaded. The previous change could not be confirmed; review before saving again.</string>
+</resources>
