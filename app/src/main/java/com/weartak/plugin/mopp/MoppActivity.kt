@@ -22,13 +22,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
-import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.RadioButton
+import androidx.wear.compose.material.ToggleChip
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.material.Text
-import androidx.wear.compose.material.ToggleChip
 import com.weartak.plugin.mopp.host.MoppPluginBinder
 import com.weartak.plugin.mopp.host.MoppRuntime
 import kotlinx.coroutines.CoroutineScope
@@ -58,8 +57,6 @@ class MoppActivity : ComponentActivity() {
                     launchError = launchError,
                     onBack = ::openWearTak,
                     onSelect = { posture -> worker.launch { MoppRuntime.editor.save(posture) } },
-                    onRead = { worker.launch { MoppRuntime.editor.read() } },
-                    onEnable = { enabled -> worker.launch { MoppRuntime.editor.setEnabled(enabled) } },
                 )
             }
         }
@@ -96,8 +93,7 @@ class MoppActivity : ComponentActivity() {
 }
 
 @Composable
-private fun postureLabel(posture: Posture?): String = when (posture) {
-    null -> stringResource(R.string.never_saved)
+private fun postureLabel(posture: Posture): String = when (posture) {
     Posture.NONE -> stringResource(R.string.none)
     else -> stringResource(R.string.mopp_level, posture.wireValue.toInt())
 }
@@ -108,8 +104,6 @@ private fun MoppScreen(
     launchError: Boolean,
     onBack: () -> Unit,
     onSelect: (Posture) -> Unit,
-    onRead: () -> Unit,
-    onEnable: (Boolean) -> Unit,
 ) {
     ScalingLazyColumn(
         modifier = Modifier.fillMaxWidth(),
@@ -138,40 +132,17 @@ private fun MoppScreen(
             Availability.UPDATE_WEARTAK -> item { Notice(R.string.update_weartak, error = true) }
             Availability.READY -> {
                 val saved = state.saved
-                if (saved != null) {
+                if (saved?.selection != null) {
                     item {
-                        Text(
-                            stringResource(R.string.saved_selection, postureLabel(saved.selection)),
-                            style = MaterialTheme.typography.title3,
+                        val timestamp = saved.savedAtEpochMillis
+                        if (timestamp == null) Notice(R.string.unknown_saved_time) else Text(
+                            stringResource(
+                                R.string.saved_time,
+                                DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
+                                    .format(Date(timestamp)),
+                            ),
+                            style = MaterialTheme.typography.caption2,
                             textAlign = TextAlign.Center,
-                        )
-                    }
-                    if (saved.selection != null) {
-                        item {
-                            val timestamp = saved.savedAtEpochMillis
-                            if (timestamp == null) Notice(R.string.unknown_saved_time) else Text(
-                                stringResource(
-                                    R.string.saved_time,
-                                    DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT)
-                                        .format(Date(timestamp)),
-                                ),
-                                style = MaterialTheme.typography.caption2,
-                                textAlign = TextAlign.Center,
-                            )
-                        }
-                    }
-                    item {
-                        ToggleChip(
-                            checked = saved.enabled,
-                            onCheckedChange = onEnable,
-                            enabled = state.canToggle,
-                            label = {
-                                Text(stringResource(if (saved.enabled) R.string.enabled else R.string.disabled))
-                            },
-                            toggleControl = {
-                                androidx.wear.compose.material.Switch(checked = saved.enabled)
-                            },
-                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }
@@ -187,14 +158,6 @@ private fun MoppScreen(
                             modifier = Modifier.fillMaxWidth(),
                         )
                     }
-                }
-                item {
-                    Chip(
-                        onClick = onRead,
-                        enabled = !state.busy,
-                        label = { Text(stringResource(R.string.refresh)) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
                 }
             }
         }
