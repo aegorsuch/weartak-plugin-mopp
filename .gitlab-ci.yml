@@ -1,6 +1,13 @@
 # MOPP CI/CD - same model as WearTAK WearOS (core/weartak-core/wearos-tak-civ) and the
 # WearTAK plugin template: production-signed release builds, then a verified rolling GitHub
 # release and a tester checklist. See ci/README.md.
+include:
+  - project: devsecops/gitlab-ci-common
+    ref: master
+    file: /template/artifactory_token_service.yml
+
+before_script: []
+
 variables:
   GRADLE_BUILD_LAUNCHER_TAG: "2.6.2"
   KUBERNETES_MEMORY_LIMIT: "8Gi"
@@ -15,6 +22,12 @@ stages:
   image:
     name: ${TAK_REGISTRY_HOST}/devsecops/gradle-build-launcher:17-${GRADLE_BUILD_LAUNCHER_TAG}
     entrypoint: [""]
+
+.artifactory_credentials:
+  extends: .artifactory_service_create_token_no_depends_bash
+  before_script:
+    - !reference [.artifactory_service_create_token_no_depends_bash, before_script]
+    - export ARTIFACTORY_USER="$GITLAB_USER_EMAIL" ARTIFACTORY_PASSWORD="$CI_JOB_ARTIFACTORY_TOKEN"
 
 release_publisher_tests:
   stage: test
@@ -42,7 +55,7 @@ release_checklist_tests:
 
 # Unit tests + debug build on every merge request and main push (no production signing).
 unit_tests:
-  extends: .gradle_image
+  extends: [.gradle_image, .artifactory_credentials]
   stage: test
   interruptible: true
   script:
@@ -64,10 +77,11 @@ unit_tests:
 # WearTAK (signature-level BIND_PLUGIN permission) can bind the plugin.
 # ---------------------------------------------------------------------------
 .release_build:
-  extends: .gradle_image
+  extends: [.gradle_image, .artifactory_credentials]
   stage: build
 
   before_script:
+    - !reference [.artifactory_credentials, before_script]
     - chmod +x gradlew scripts/fetch-sdk.sh
     - |
       for var in WEARTAK_RELEASE_KEYSTORE_B64 RELEASE_STORE_PASSWORD RELEASE_KEY_ALIAS RELEASE_KEY_PASSWORD; do

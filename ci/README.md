@@ -41,6 +41,17 @@ consumer when a complete pair exists: first nonblank user from
 paired with first nonblank password from `ARTIFACTORY_CONSUME_PASSWORD`,
 `ARTIFACTORY_PASSWORD`, `TAK_PASSWORD`. Public repository fallbacks remain.
 Only availability booleans are logged; never print credential values.
+Gradle jobs obtain a short-lived per-job token through
+`devsecops/gitlab-ci-common`'s `artifactory_token_service.yml`, using the
+`_no_depends_bash` template for the non-root launcher image. Token setup is
+explicitly referenced first when a job has its own `before_script`. Non-Gradle
+jobs retain an empty global setup. No static credentials or bundled Gradle init
+script are required; the latter conflicts with `FAIL_ON_PROJECT_REPOS`.
+Robolectric's separate test-JVM resolver receives the same Artifactory routing.
+First-time token exchange may require the triggering user to sign in at
+`https://artifacts.tak.gov`; successful CI logs must show `Token exchange successful`
+and `takArtifactory for plugins: enabled` without disclosing tokens.
+This Maven routing does not grant cross-project SDK source access.
 
 ## Versioning
 
