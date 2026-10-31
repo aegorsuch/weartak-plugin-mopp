@@ -10,7 +10,7 @@
     </queries>
     <application
         android:allowBackup="false"
-        android:icon="@drawable/mopp_launcher"
+        android:icon="@mipmap/mopp_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.Mopp">

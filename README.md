@@ -11,6 +11,14 @@ like LACE, not a launcher-only tool. Discovery uses the signature-protected
 `externalMainActivity=true` so WearTAK can open the editor. The watch launcher is
 an additional entry point. This repository does not target Garmin or iOS.
 
+Launcher metadata uses density-specific PNGs at `@mipmap/mopp_launcher`
+(36/48/72/96/144/192 px for ldpi through xxxhdpi). These preserve the existing
+48dp black circle and white shield, including transparent corners.
+`@drawable/mopp_launcher` remains the unchanged vector for internal use.
+Raster launcher packaging is a Knox import compatibility experiment, not proof
+of acceptance. Knox acceptance remains pending a production-signed TAK.gov CI
+build and user upload.
+
 **Migration in progress; not yet cleared for release.** The editor, typed SDK
 adapter, plugin entry point, packaging and tests are implemented. Matching WearTAK
 host persistence, lifecycle and reporting gates must pass coordinated acceptance.
