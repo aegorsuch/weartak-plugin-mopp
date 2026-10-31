@@ -13,8 +13,9 @@ an additional entry point. This repository does not target Garmin or iOS.
 
 Launcher metadata uses density-specific PNGs at `@mipmap/mopp_launcher`
 (36/48/72/96/144/192 px for ldpi through xxxhdpi). These preserve the existing
-48dp black circle and white shield, including transparent corners.
-`@drawable/mopp_launcher` remains the unchanged vector for internal use.
+48dp black circle and transparent corners, with a white gas-mask silhouette,
+distinct eye lenses and a round respirator. `@drawable/mopp_launcher` carries
+the matching vector artwork for internal use.
 Raster launcher packaging is a Knox import compatibility experiment, not proof
 of acceptance. Knox acceptance remains pending a production-signed TAK.gov CI
 build and user upload.
