@@ -3,6 +3,7 @@ package com.weartak.plugin.mopp.host
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.graphics.drawable.VectorDrawable
 import android.util.TypedValue
 import com.weartak.plugin.mopp.BuildConfig
@@ -67,6 +68,22 @@ class MoppDiscoveryTest {
             assertNotNull(bitmap)
             assertEquals(size, bitmap.width)
             assertEquals(size, bitmap.height)
+            assertEquals(0, Color.alpha(bitmap.getPixel(0, 0)))
+            for ((x, y, expected) in listOf(
+                Triple(24, 4, 0),
+                Triple(24, 12, 255),
+                Triple(18, 20, 0),
+                Triple(30, 20, 0),
+                Triple(24, 33, 0),
+                Triple(24, 30, 255),
+                Triple(24, 35, 255),
+            )) {
+                val pixel = bitmap.getPixel(x * size / 48, y * size / 48)
+                assertEquals(255, Color.alpha(pixel))
+                assertEquals(Color.red(pixel), Color.green(pixel))
+                assertEquals(Color.red(pixel), Color.blue(pixel))
+                assertEquals(expected.toDouble(), Color.red(pixel).toDouble(), 16.0)
+            }
             bitmap.recycle()
         }
         assertTrue(context.getDrawable(R.drawable.mopp_launcher) is VectorDrawable)
