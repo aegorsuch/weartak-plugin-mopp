@@ -36,6 +36,11 @@ def environment():
 
 
 def asset(asset_id, iid, content=b"old apk"):
+    name = f"{p.ASSET_PREFIX}5.8.0.3-p{iid}.apk"
+    return {"id": asset_id, "name": name, "label": name, "state": "uploaded", "size": len(content)}
+
+
+def previous_asset(asset_id, iid, content=b"old apk"):
     name = f"MOPP-5.8.0.3-p{iid}.apk"
     return {"id": asset_id, "name": name, "label": name, "state": "uploaded", "size": len(content)}
 
@@ -154,11 +159,18 @@ class PublisherTests(unittest.TestCase):
         self.assertEqual(api.release["name"], "TAK.gov Forge CI/CD Pipeline Release (5.8.0.3-p12)")
         self.assertEqual(api.release["tag_name"], "TAK.gov-Forge-CI-CD-Pipeline-Release")
         self.assertEqual([(a["name"], a["label"]) for a in api.items],
-                         [("MOPP-5.8.0.3-p12.apk", "MOPP-5.8.0.3-p12.apk")])
+                         [("WearTAK-Plugin-MOPP-5.8.0.3-p12.apk",
+                           "WearTAK-Plugin-MOPP-5.8.0.3-p12.apk")])
         self.assertEqual(api.release["make_latest"], "false")
         body = api.release["body"]
         for value in ("5.8.0.3", "583", self.digest, "e" * 40, self.state["pipeline_url"]):
             self.assertIn(value, body)
+        self.assertIn(
+            "[WearTAK-Plugin-MOPP-5.8.0.3-p12.apk]"
+            "(https://github.com/aegorsuch/weartak-plugin-mopp/releases/download/"
+            "TAK.gov-Forge-CI-CD-Pipeline-Release/WearTAK-Plugin-MOPP-5.8.0.3-p12.apk)",
+            body,
+        )
         methods = [c[0] for c in api.calls]
         self.assertLess(methods.index("DOWNLOAD"), methods.index("PATCH"))
 
@@ -208,6 +220,12 @@ class PublisherTests(unittest.TestCase):
         self.assertTrue(all("tags/" not in c[1] for c in api.calls if c[0] != "GET"))
         self.assertFalse(any(c[:2] == ("DELETE", "releases/1") for c in api.calls))
 
+    def test_previous_name_assets_remain_for_consumer_migration(self):
+        api = FakeGitHub(dict(self.state, pipeline_iid=11))
+        api.items = [previous_asset(1, 12), previous_asset(2, 10)]
+        self.publish(api)
+        self.assertEqual({a["id"] for a in api.items}, {1, 2, 100})
+
     def test_older_pipeline_cannot_replace_newer(self):
         api = FakeGitHub(dict(self.state, pipeline_iid=13))
         self.publish(api)
@@ -249,8 +267,17 @@ class PublisherTests(unittest.TestCase):
         api = FakeGitHub()
         self.publish(api)
         self.assertEqual(api.release["name"], "TAK.gov Forge CI/CD Pipeline Release (5.8.0.3-p12)")
-        self.assertEqual(api.items[0]["name"], "MOPP-5.8.0.3-p12.apk")
+        self.assertEqual(api.items[0]["name"], "WearTAK-Plugin-MOPP-5.8.0.3-p12.apk")
         self.assertIn("5.8.0.3-p12+de139f69", api.release["body"])
+
+    def test_pipeline_iid_normalizes_stale_version_metadata_suffix(self):
+        self.metadata["elements"][0].update(versionName="5.8.0.3-p9+de139f69", versionCode=5830012)
+        self.write_metadata()
+        api = FakeGitHub()
+        self.publish(api)
+        self.assertEqual(api.release["name"], "TAK.gov Forge CI/CD Pipeline Release (5.8.0.3-p12)")
+        self.assertEqual(api.items[0]["name"], "WearTAK-Plugin-MOPP-5.8.0.3-p12.apk")
+        self.assertIn("5.8.0.3-p9+de139f69", api.release["body"])
 
     def test_legacy_named_assets_are_cleaned_up(self):
         api = FakeGitHub(dict(self.state, pipeline_iid=11))

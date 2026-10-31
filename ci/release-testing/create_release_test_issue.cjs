@@ -5,7 +5,8 @@ const { join } = require('node:path');
 const TAG = 'TAK.gov-Forge-CI-CD-Pipeline-Release';
 const RELEASE_MARKER = /<!-- mopp-rolling-v1 (\{.*?\}) -->/;
 const PROJECT_ID = '6933';
-const APK = /^MOPP-[0-9A-Za-z._-]+\.apk$/;
+const APK = /^WearTAK-Plugin-MOPP-[0-9A-Za-z._-]+-p[1-9]\d*\.apk$/;
+const PREVIOUS_APK = /^MOPP-[0-9A-Za-z._-]+\.apk$/;
 
 function releaseState(release) {
   const match = RELEASE_MARKER.exec(release.body || '');
@@ -56,7 +57,9 @@ async function createReleaseTestIssue({ github, context, core, tester }) {
       return null;
     }
   }
-  const apk = (release.assets || []).find((a) => APK.test(a.name) && a.state === 'uploaded');
+  const uploadedAssets = (release.assets || []).filter((a) => a.state === 'uploaded');
+  const apk = uploadedAssets.find((a) => APK.test(a.name)) ||
+    uploadedAssets.find((a) => PREVIOUS_APK.test(a.name));
   if (!apk) throw new Error(`Release ${TAG} has no uploaded MOPP APK.`);
 
   const marker = `<!-- mopp-release-testing:pipeline-${pipelineId} -->`;

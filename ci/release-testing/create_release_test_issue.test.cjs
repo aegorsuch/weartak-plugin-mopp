@@ -13,8 +13,8 @@ function release(overrides = {}) {
     html_url: `https://github.com/o/r/releases/tag/${TAG}`,
     body: `- APK version: **5.8.0.3-p108**\n\n<!-- mopp-rolling-v1 ${JSON.stringify(STATE)} -->`,
     assets: [{
-      name: 'MOPP-5.8.0.3-p108.apk', state: 'uploaded',
-      browser_download_url: 'https://github.com/o/r/releases/download/x/MOPP-5.8.0.3-p108.apk',
+      name: 'WearTAK-Plugin-MOPP-5.8.0.3-p108.apk', state: 'uploaded',
+      browser_download_url: 'https://github.com/o/r/releases/download/x/WearTAK-Plugin-MOPP-5.8.0.3-p108.apk',
     }],
     ...overrides,
   };
@@ -66,9 +66,27 @@ test('creates one assigned checklist with download link and release details', as
   assert.equal(issue.title, 'Release testing: TAK.gov Forge CI/CD Pipeline Release (5.8.0.3-p108)');
   assert.deepEqual(issue.assignees, ['paul-weartak']);
   assert.match(issue.body, /<!-- mopp-release-testing:pipeline-1791701 -->/);
-  assert.match(issue.body, /\[MOPP-5\.8\.0\.3-p108\.apk\]\(https:/);
+  assert.match(issue.body, /\[WearTAK-Plugin-MOPP-5\.8\.0\.3-p108\.apk\]\(https:/);
   assert.match(issue.body, /APK version: \*\*5\.8\.0\.3-p108\*\*/);
   assert.match(issue.body, /## Core acceptance checklist/);
+});
+
+test('prefers the prefixed APK while older consumers still leave old assets available', async () => {
+  const rel = release({
+    assets: [
+      {
+        name: 'MOPP-5.8.0.3-p108.apk', state: 'uploaded',
+        browser_download_url: 'https://github.com/o/r/releases/download/x/MOPP-5.8.0.3-p108.apk',
+      },
+      ...release().assets,
+    ],
+  });
+  const f = fake({ rel });
+  await createReleaseTestIssue({ ...f, context: dispatch(), tester: 'paul-weartak' });
+  assert.match(
+    f.calls.created[0].body,
+    /\[WearTAK-Plugin-MOPP-5\.8\.0\.3-p108\.apk\]\(https:\/\/github\.com\/o\/r\/releases\/download\/x\/WearTAK-Plugin-MOPP-5\.8\.0\.3-p108\.apk\)/,
+  );
 });
 
 test('existing checklist (even closed) is not duplicated', async () => {
