@@ -16,7 +16,10 @@ REPO = "aegorsuch/weartak-plugin-mopp"
 TAG = "TAK.gov-Forge-CI-CD-Pipeline-Release"
 TITLE = "TAK.gov Forge CI/CD Pipeline Release"
 MARKER = "mopp-rolling-v1"
-ASSET_PATTERN = re.compile(r"MOPP-[0-9A-Za-z._-]*-p([1-9][0-9]*)\.apk")
+ASSET_PREFIX = "WearTAK-Plugin-MOPP-"
+ASSET_PATTERN = re.compile(
+    rf"{re.escape(ASSET_PREFIX)}[0-9A-Za-z._-]*-p([1-9][0-9]*)\.apk"
+)
 LEGACY_ASSET_PATTERN = re.compile(r"mopp-development-p([1-9][0-9]*)-([0-9a-f]{64})\.apk")
 LABEL_PREFIX = "mopp-rolling-v1:"
 # Handled by .github/workflows/release-testing.yml on the GitHub default branch.
@@ -196,8 +199,8 @@ def state_from(release, project_id):
 def display_version(version, pipeline_iid):
     """User-facing build id, e.g. 5.8.0.3-p105 (drops +sha build metadata)."""
     short = version.split("+", 1)[0]
-    suffix = f"-p{pipeline_iid}"
-    return short if short.endswith(suffix) else short + suffix
+    short = re.sub(r"-p[1-9][0-9]*$", "", short)
+    return f"{short}-p{pipeline_iid}"
 
 
 def asset_pipeline(asset):
@@ -245,9 +248,15 @@ def publish(api, state, apk, digest, version, code):
     state = dict(state, sha256=digest)
     short = display_version(version, state["pipeline_iid"])
     title = f"{TITLE} ({short})"
+    name = f"{ASSET_PREFIX}{short}.apk"
+    download_url = (
+        f"https://github.com/{REPO}/releases/download/{TAG}/"
+        f"{urllib.parse.quote(name, safe='')}"
+    )
     body = (
         "Automatically published stable MOPP main-channel build.\n\n"
         f"- APK version: **{version}** (versionCode **{code}**)\n"
+        f"- APK: [{name}]({download_url})\n"
         f"- Build: GitLab pipeline **{state['pipeline_id']}** "
         f"(project pipeline **{state['pipeline_iid']}**)\n"
         f"- Pipeline: {state['pipeline_url']}\n"
@@ -265,7 +274,6 @@ def publish(api, state, apk, digest, version, code):
         })
     release_id = release["id"]
     assets = api.assets(release_id)
-    name = f"MOPP-{short}.apk"
     # GitHub shows the label instead of the file name, so keep it human-readable.
     label = name
     existing = [item for item in assets if item["name"] == name]

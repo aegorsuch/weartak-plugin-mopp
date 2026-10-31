@@ -66,10 +66,12 @@ Same scheme as WearTAK (WEARTAK-239), in `app/build.gradle.kts`:
 
 After **all** earlier jobs pass, `publish_github_main` publishes the verified `main_release`
 APK to the GitHub mirror as **TAK.gov Forge CI/CD Pipeline Release (<version>)** on the
-fixed tag `TAK.gov-Forge-CI-CD-Pipeline-Release`, asset `MOPP-<version>.apk`
-(`<version>` is the versionName without `+sha`). It is a stable release (`prerelease=false`)
-that does not take GitHub's "Latest" flag. The body records versionName/versionCode,
-pipeline ID/IID and URL, source SHA and APK SHA-256.
+fixed tag `TAK.gov-Forge-CI-CD-Pipeline-Release`, asset
+`WearTAK-Plugin-MOPP-<version>.apk` (`<version>` is the versionName without `+sha`).
+It is a stable release (`prerelease=false`) that does not take GitHub's "Latest" flag.
+The body records versionName/versionCode, pipeline ID/IID and URL, source SHA and APK SHA-256.
+Previous `MOPP-<version>.apk` assets remain available for existing consumers; cleanup of
+those legacy names requires consumer verification.
 
 Safety rules (identical to WearOS, see `ci/publish_github_release.py`):
 
