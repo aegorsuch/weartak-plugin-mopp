@@ -181,9 +181,14 @@ or release is implied by a successful debug build or mocked publisher tests.
 
 ## License
 
-No project-level license file or plugin-source license declaration is present in
-this repository; the plugin's license is not specified.
+The repository owner's original code is licensed under the
+GNU General Public License, version 3 or (at your option) any later version
+(`GPL-3.0-or-later`). See [LICENSE](LICENSE) for the complete license text.
+
+This declaration covers only the repository owner's original code, not
+third-party components, which retain their own licenses and notices.
 The Gradle wrapper scripts ([`gradlew`](gradlew), [`gradlew.bat`](gradlew.bat))
-carry Apache License 2.0 notices. Those notices apply to the wrapper scripts,
-not a blanket license for the plugin. Existing third-party licensing obligations
-remain unchanged.
+and bundled [`gradle-wrapper.jar`](gradle/wrapper/gradle-wrapper.jar) retain
+their Apache License 2.0 notices; the JAR includes `META-INF/LICENSE`.
+Existing source-provenance statements, attributions and third-party licensing
+obligations remain unchanged.
