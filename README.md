@@ -1,5 +1,7 @@
 # WearTAK MOPP plugin
 
+## Purpose and Capabilities
+
 Separately installable native Wear OS plugin, application ID
 `com.weartak.plugin.mopp`. TAK.gov project **6933** is canonical:
 `https://git.tak.gov/weartak-plugins/weartak-plugin-mopp`.
@@ -20,6 +22,8 @@ Raster launcher packaging is a Knox import compatibility experiment, not proof
 of acceptance. Knox acceptance remains pending a production-signed TAK.gov CI
 build and user upload.
 
+## Status
+
 **Migration in progress; not yet cleared for release.** The editor, typed SDK
 adapter, plugin entry point, packaging and tests are implemented. Matching WearTAK
 host persistence, lifecycle and reporting gates must pass coordinated acceptance.
@@ -33,7 +37,65 @@ host acceptance. Actual MOPP UI belongs to this
 plugin; the host retains storage and status projection.
 Do not install against a host that lacks the matching typed capability.
 
-## Source provenance
+## Point of Contacts
+
+No named maintainer or support contact is documented in this repository.
+Project references: [canonical TAK.gov project](https://git.tak.gov/weartak-plugins/weartak-plugin-mopp)
+and [public GitHub mirror](https://github.com/aegorsuch/weartak-plugin-mopp).
+
+## Ports Required
+
+No plugin-specific TCP/UDP ports are documented. The plugin declares no
+`INTERNET` permission in [`AndroidManifest.xml`](app/src/main/AndroidManifest.xml);
+host communication uses the signature-protected Binder service described below.
+WearTAK host network requirements are not specified in this repository.
+
+## Equipment Required
+
+A Wear OS watch is required by the manifest's `android.hardware.type.watch`
+feature. The plugin requires Android API 30 or later and a matching WearTAK host
+with the typed MOPP capability described under [Compatibility gate](#compatibility-gate).
+Release WearTAK requires matching production signing; debug builds work only
+with WearTAK `.dev`, as documented in [CI/CD and releases](ci/README.md).
+Development tooling is listed under [Compilation](#compilation).
+
+## Equipment Supported
+
+The target platform is Wear OS; specific supported watch models and completed
+hardware acceptance are not documented. Garmin and iOS are not targeted.
+Source publication and debug builds do not establish device acceptance.
+
+## Compilation
+
+### Build
+
+Use JDK 17 and Android SDK 35. Packaging follows LACE's pinned canonical revision
+`c1e0116925b199a4a081ddc5682f8434888fd006`: Gradle 8.14.5, AGP 8.13.2,
+Kotlin 2.2.0, minSdk 30 and targetSdk 34. MOPP's base version **5.8.4**
+matches WearTAK and the other WearTAK plugins (base versionCode **584**).
+
+Build SDK inputs from the canonical repository and immutable commit recorded in
+[`sdk-source.properties`](sdk-source.properties):
+
+```powershell
+.\scripts\fetch-sdk.ps1
+.\gradlew.bat --no-daemon :app:testDebugUnitTest :app:assembleDebug :app:lintDebug
+```
+
+PowerShell script execution must be permitted by the user's existing system
+policy; do not weaken or bypass that policy. On a host with Bash, the equivalent
+repository-supported command is `scripts/fetch-sdk.sh`.
+Set `ANDROID_HOME` to the installed Android SDK if needed.
+SDK source needs Android SDK 34; plugin compilation needs SDK 35. Fetch scripts
+verify the canonical origin and exact source commit, refuse local SDK source
+changes, then build debug/release AARs under ignored `.gradle\mopp-sdk-source`.
+Derived inputs are copied to ignored `app\libs`; **never commit them**. Scripts
+print source revision and local SHA-256 values for provenance, not binary trust.
+No unsigned SDK release download or signature-policy bypass is involved.
+
+## Developer Notes
+
+### Source provenance
 
 Initial source was authored in the standalone MOPP development session and imported
 from its sanitized October 30, 2026 snapshot. Packaging and CI were adapted from
@@ -42,7 +104,7 @@ SDK binaries, local configuration, signing material and build outputs are not
 included. Source mirrors automatically; signed APK publication is a separate
 verified step after all release gates below are satisfied.
 
-## State ownership and behavior
+### State ownership and behavior
 
 WearTAK must remain the sole durable `savedPPE` authority and SELF_STATUS writer.
 MOPP keeps only an in-memory pending selection and the last host read. None is distinct from
@@ -81,7 +143,7 @@ The production host must independently check package, Binder UID, signing trust,
 current binding lease, revision, mutation identity and durable commit success on
 every operation.
 
-## Compatibility gate
+### Compatibility gate
 
 `PluginInitParcel.hostExtras` advertises `MoppPpeContract.EXTRA_CAPABILITY`
 (`moppPpeV1`) and `EXTRA_CONTROL` (`moppPpeControlV1`). The control implements the
@@ -95,33 +157,7 @@ The adapter never manually encodes Binder transactions or invokes raw CoT APIs.
 Host-side builtin routing removal and all reporting gates must ship together with
 this plugin, without duplicate writers.
 
-## Build
-
-Use JDK 17 and Android SDK 35. Packaging follows LACE's pinned canonical revision
-`c1e0116925b199a4a081ddc5682f8434888fd006`: Gradle 8.14.5, AGP 8.13.2,
-Kotlin 2.2.0, minSdk 30 and targetSdk 34. MOPP's base version **5.8.4**
-matches WearTAK and the other WearTAK plugins (base versionCode **584**).
-
-Build SDK inputs from the canonical repository and immutable commit recorded in
-[`sdk-source.properties`](sdk-source.properties):
-
-```powershell
-.\scripts\fetch-sdk.ps1
-.\gradlew.bat --no-daemon :app:testDebugUnitTest :app:assembleDebug :app:lintDebug
-```
-
-PowerShell script execution must be permitted by the user's existing system
-policy; do not weaken or bypass that policy. On a host with Bash, the equivalent
-repository-supported command is `scripts/fetch-sdk.sh`.
-Set `ANDROID_HOME` to the installed Android SDK if needed.
-SDK source needs Android SDK 34; plugin compilation needs SDK 35. Fetch scripts
-verify the canonical origin and exact source commit, refuse local SDK source
-changes, then build debug/release AARs under ignored `.gradle\mopp-sdk-source`.
-Derived inputs are copied to ignored `app\libs`; **never commit them**. Scripts
-print source revision and local SHA-256 values for provenance, not binary trust.
-No unsigned SDK release download or signature-policy bypass is involved.
-
-## Release gates
+### Release gates
 
 See [CI/CD and releases](ci/README.md) and the
 [manual acceptance checklist](ci/release-testing/checklist.md).
@@ -142,3 +178,12 @@ Do not distribute an operational release until all gates pass.
 
 No device pass, production-signature pass, canonical merge, mirror publication,
 or release is implied by a successful debug build or mocked publisher tests.
+
+## License
+
+No project-level license file or plugin-source license declaration is present in
+this repository; the plugin's license is not specified.
+The Gradle wrapper scripts ([`gradlew`](gradlew), [`gradlew.bat`](gradlew.bat))
+carry Apache License 2.0 notices. Those notices apply to the wrapper scripts,
+not a blanket license for the plugin. Existing third-party licensing obligations
+remain unchanged.
